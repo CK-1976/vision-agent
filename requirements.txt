@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+httpx
+pillow
+python-multipart
+langgraph>=0.2.0
+langchain
+langchain-community
+langchain-openai  
+pydantic
+python-dotenv
+httpx[socks]
+dashscope

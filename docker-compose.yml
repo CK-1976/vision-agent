@@ -1,0 +1,48 @@
+services:
+  # 服务 1: REX-OMNI
+  rex-omni:
+    build: 
+      context: ./REX-OMNI
+      dockerfile: Dockerfile
+    container_name: rex_omni
+    restart: always
+    ports:
+      - "8001:8001"  # 宿主机端口:容器端口 (请确认 api_server.py 的端口)
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0'] # 强制使用 GPU 0
+              capabilities: [gpu]
+    environment:
+      # 自动使用国内镜像站 
+      - HF_ENDPOINT=https://hf-mirror.com
+      # 之前的路径设置
+      - PYTHONPATH=/app
+    volumes:
+      - ./REX-OMNI/logs:/app/logs # 假设有日志目录
+      - ./hf_cache:/root/.cache/huggingface
+      - /usr/share/fonts:/usr/share/fonts:ro
+    ipc: host # 共享内存，对于 PyTorch Dataloader 很重要
+
+  # 服务 2: VISION-AGENT
+  vision-agent:
+    build: 
+      context: ./VISION-AGENT
+      dockerfile: Dockerfile
+    container_name: vision_agent
+    restart: always
+    ports:
+      - "7860:7860"  # 宿主机端口:容器端口 (注意避开 8001)
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0'] # 同样使用 GPU 0
+              capabilities: [gpu]
+    volumes:
+      - ./VISION-AGENT/logs:/app/logs
+      - ./hf_cache:/root/.cache/huggingface
+    ipc: host

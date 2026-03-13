@@ -11,3 +11,4 @@ pydantic
 python-dotenv
 httpx[socks]
 dashscope
+langchain-qwq
